@@ -2,19 +2,22 @@ const webpack = require("webpack");
 const path = require("path");
 const target_dir = "../../assets/dist/";
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
   entry: {
-    app: ["./src/client/index.js"]
+    app: ["./src/client/app.js"]
   },
 
   mode: process.env.NODE_ENV || "development",
 
   output: {
     path: path.resolve(__dirname, target_dir),
-    filename: "[name].js",
-    publicPath: "/dist/"
+    filename:
+      process.env.NODE_ENV === "production" ? "[name].[hash].js" : "[name].js",
+    chunkFilename:
+      process.env.NODE_ENV === "production" ? "[name].[hash].js" : "[name].js",
+    publicPath: "/assets/dist/"
   },
 
   plugins: [
@@ -33,24 +36,19 @@ module.exports = {
   ],
 
   resolve: {
-    extensions: [".js", ".jsx"]
+    extensions: [".ts", ".js", ".vue"],
+    alias: {
+      vue$: "vue/dist/vue.esm.js"
+    }
   },
 
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /(node_modules)/,
-        loader: "babel-loader",
-        query: {
-          presets: ["es2015"]
-        }
-      },
-      {
         test: /\.vue$/,
         exclude: /(node_modules)/,
         loader: "vue-loader"
-      },
+      }
     ]
   },
 
@@ -58,11 +56,4 @@ module.exports = {
     // make sure to include the plugin!
     new VueLoaderPlugin()
   ]
-
-  // resolve: {
-  //   extensions: [".js", ".vue"],
-  //   alias: {
-  //     vue$: "vue/dist/vue.esm.js"
-  //   }
-  // },
 };
